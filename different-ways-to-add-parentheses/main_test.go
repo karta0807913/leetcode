@@ -66,35 +66,26 @@ func cal(cells []NumberCell) []int {
 	panic("cell count is not 2 or 3")
 }
 
-func recursive(cells []NumberCell, start, end int, cache [][][]int) []int {
-	if cache[start][end] != nil {
-		return cache[start][end]
-	}
+func recursive(cells []NumberCell, start, end int) []int {
 	if end-start < 3 {
-		cache[start][end] = cal(cells[start : end+1])
-		return cache[start][end]
+		return cal(cells[start : end+1])
 	}
 	answer := make([]int, 0)
 	for idx := start; idx < end; idx++ {
-		left := recursive(cells, start, idx, cache)
-		right := recursive(cells, idx+1, end, cache)
+		left := recursive(cells, start, idx)
+		right := recursive(cells, idx+1, end)
 		for _, leftVal := range left {
 			for _, rightVal := range right {
 				answer = append(answer, cells[idx].Operator(leftVal, rightVal))
 			}
 		}
 	}
-	cache[start][end] = answer
 	return answer
 }
 
 func diffWaysToCompute(expression string) []int {
 	cells := decodeExpression(expression)
-	cache := make([][][]int, len(cells))
-	for colIdx := range cache {
-		cache[colIdx] = make([][]int, len(cells))
-	}
-	return recursive(cells, 0, len(cells)-1, cache)
+	return recursive(cells, 0, len(cells)-1)
 }
 
 func TestWays(t *testing.T) {
