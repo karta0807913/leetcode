@@ -7,9 +7,8 @@ import (
 )
 
 type Node struct {
-	Searched bool
-	Depth    int
-	Next     []int
+	Depth int
+	Next  []int
 }
 
 func iterate(graph []Node, startIdx int) bool {
@@ -18,9 +17,6 @@ func iterate(graph []Node, startIdx int) bool {
 	for idx := 0; idx < len(nextList); idx++ {
 		node := &graph[nextList[idx]]
 		for _, val := range node.Next {
-			if graph[val].Searched {
-				continue
-			}
 			if graph[val].Depth != 0 {
 				if graph[val].Depth&1 == node.Depth&1 {
 					return false
@@ -31,24 +27,22 @@ func iterate(graph []Node, startIdx int) bool {
 			}
 		}
 	}
-	for _, idx := range nextList {
-		graph[idx].Searched = true
-	}
 	return true
 }
 
 // Bipartite Graph Recognition Problem
+// It looks like a one way list, but actually it's a bidirectional list
 func possibleBipartition(n int, dislikes [][]int) bool {
 	graph := make([]Node, n+1)
 	for _, dislike := range dislikes {
 		graph[dislike[0]].Next = append(graph[dislike[0]].Next, dislike[1])
+		graph[dislike[1]].Next = append(graph[dislike[1]].Next, dislike[0])
 	}
 	for idx := range graph {
-		if !graph[idx].Searched {
+		if graph[idx].Depth == 0 {
 			if !iterate(graph, idx) {
 				return false
 			}
-			graph[idx].Searched = true
 		}
 	}
 	return true
