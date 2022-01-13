@@ -6,44 +6,45 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func binarySearch(nums []int, target int) (int, int, int) {
-	for left, right := 0, len(nums)-1; left <= right; {
-		mid := (left + right) / 2
-		if nums[mid] == target {
-			return mid, left, right
-		} else if nums[mid] < target {
-			left = mid + 1
-		} else {
-			right = mid - 1
-		}
-	}
-	return -1, 0, 0
+func searchRange(nums []int, target int) []int {
+	ans := []int{-1, -1}
+	ans[0] = FindFirst(nums, target)
+	ans[1] = FindLast(nums, target)
+	return ans
 }
 
-func searchRange(nums []int, target int) []int {
-	if len(nums) == 0 {
-		return []int{-1, -1}
+func FindLast(nums []int, target int) (ans int) {
+	left, right := 0, len(nums)-1
+	ans = -1
+	for left <= right {
+		i := (left + right) / 2
+		if nums[i] == target {
+			ans = i
+		}
+		if nums[i] <= target {
+			left = i + 1
+		} else {
+			right = i - 1
+		}
 	}
-	if nums[0] == target && nums[len(nums)-1] == target {
-		return []int{0, len(nums) - 1}
+	return ans
+}
+
+func FindFirst(nums []int, target int) (ans int) {
+	ans = -1
+	left, right := 0, len(nums)-1
+	for left <= right {
+		i := (left + right) / 2
+		if nums[i] == target {
+			ans = i
+		}
+		if target <= nums[i] {
+			right = i - 1
+		} else {
+			left = i + 1
+		}
 	}
-	idx, left, right := binarySearch(nums, target)
-	if idx == -1 {
-		return []int{-1, -1}
-	}
-	leftTarget := searchRange(nums[left:idx], target)
-	if leftTarget[0] == -1 {
-		left = idx
-	} else {
-		left = leftTarget[0] + left
-	}
-	rightTarget := searchRange(nums[idx+1:right+1], target)
-	if rightTarget[1] == -1 {
-		right = idx
-	} else {
-		right = rightTarget[1] + idx + 1
-	}
-	return []int{left, right}
+	return ans
 }
 
 func TestSearchRange(t *testing.T) {
@@ -59,6 +60,4 @@ func TestSearchRange(t *testing.T) {
 	assert.Equal(t, []int{-1, -1}, searchRange([]int{}, 3))
 	assert.Equal(t, []int{3, 4}, searchRange([]int{5, 7, 7, 8, 8, 10}, 8))
 	assert.Equal(t, []int{1, 1}, searchRange([]int{1, 2}, 2))
-	idx, _, _ := binarySearch([]int{8, 10}, 8)
-	assert.Equal(t, 0, idx)
 }
