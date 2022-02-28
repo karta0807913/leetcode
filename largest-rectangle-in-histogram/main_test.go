@@ -6,13 +6,51 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func min(a, b int) int {
-	if a < b {
+func max(a, b int) int {
+	if a > b {
 		return a
 	}
 	return b
 }
 
+func largestRectangleArea(heights []int) int {
+	area := make([]int, len(heights))
+	stack := make([]int, 1, len(heights))
+	stack[0] = 0
+	area[0] = heights[0]
+	maxArea := 0
+	for i := 1; i < len(heights); i++ {
+		h := heights[i]
+		area[i] = h
+		for n := len(stack) - 1; n >= 0; n-- {
+			target := heights[stack[n]]
+			if target < h {
+				area[i] = h * (i - stack[n])
+				break
+			} else if target > h {
+				area[stack[n]] += target * (i - stack[n] - 1)
+				maxArea = max(maxArea, area[stack[n]])
+			} else {
+				break
+			}
+			stack = stack[:n]
+		}
+		if len(stack) == 0 {
+			area[i] = h * (i + 1)
+		}
+		stack = append(stack, i)
+		// fmt.Printf("stack: %v\n", stack)
+		// fmt.Printf("area: %v\n", area)
+	}
+	for _, i := range stack {
+		area[i] += heights[i] * (len(heights) - i - 1)
+		maxArea = max(maxArea, area[i])
+	}
+	// fmt.Printf("area: %v\n", area)
+	return maxArea
+}
+
+/*
 // best?
 func largestRectangleArea(heights []int) int {
 	leftGreater := make([]int, len(heights))
