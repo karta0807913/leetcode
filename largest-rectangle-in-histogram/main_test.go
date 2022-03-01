@@ -81,10 +81,18 @@ func largestRectangleArea(heights []int) int {
 	}
 	return maxRect
 }
+*/
 
 /*
 type Pair struct {
 	Height, Idx int
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 // normal stack, faster
@@ -119,12 +127,15 @@ func largestRectangleArea(heights []int) int {
 */
 
 func TestArea(t *testing.T) {
-	// assert.Equal(t, 10, largestRectangleArea([]int{
-	// 	2, 2, 2, 3, 2,
-	// }))
-	// assert.Equal(t, 6, largestRectangleArea([]int{
-	// 	2, 3, 2,
-	// }))
+	assert.Equal(t, 3, largestRectangleArea([]int{
+		2, 1, 2,
+	}))
+	assert.Equal(t, 10, largestRectangleArea([]int{
+		2, 2, 2, 3, 2,
+	}))
+	assert.Equal(t, 6, largestRectangleArea([]int{
+		2, 3, 2,
+	}))
 	assert.Equal(t, 10, largestRectangleArea([]int{
 		2, 1, 5, 6, 2, 3,
 	}))
@@ -132,6 +143,14 @@ func TestArea(t *testing.T) {
 
 /**
 // map
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 func largestRectangleArea(heights []int) int {
 	monoStack := make(map[int]int)
 	maxRect := 0
