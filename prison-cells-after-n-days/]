@@ -1,0 +1,88 @@
+package main
+
+import (
+	"fmt"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+)
+
+func prisonAfterNDays(cells []int, n int) []int {
+	var current int
+	for i := range cells {
+		current <<= 1
+		current |= cells[i]
+	}
+	cache := make([]int, 256)
+	for n != 0 {
+		next := 0
+		tmp := current
+		prev := current & (1 << 7)
+		current <<= 1
+		for i := 1; i < len(cells)-1; i++ {
+			if prev^((current&(1<<6))<<1) == 0 {
+				next |= 1
+			}
+			next <<= 1
+			prev = current & (1 << 7)
+			current <<= 1
+		}
+		if cache[next] != 0 {
+			days := (cache[tmp] >> 8) - (cache[next] >> 8) + 1
+			n %= days
+			n = days - n
+			current = tmp
+			fmt.Printf("(cache[next] >> 8): %v\n", (cache[next] >> 8))
+			fmt.Printf("(cache[tmp] >> 8): %v\n", (cache[tmp] >> 8))
+			fmt.Printf("n: %v\n", n)
+			fmt.Printf("days: %v\n", days)
+			for ; n > 0; n-- {
+				current = cache[current&(255)]
+			}
+			break
+		}
+		n--
+		cache[next] = (((cache[tmp] >> 8) + 1) << 8) | tmp
+		current = next
+		d := current
+		for i := len(cells) - 1; i >= 0; i-- {
+			cells[i] = d & 1
+			d >>= 1
+		}
+		fmt.Printf("cells: %v\n", cells)
+	}
+	for i := len(cells) - 1; i >= 0; i-- {
+		cells[i] = current & 1
+		current >>= 1
+	}
+	fmt.Printf("cells: %v\n", cells)
+	return cells
+}
+
+func TestDays(t *testing.T) {
+	assert := require.New(t)
+	assert.Equal(
+		[]int{
+			0, 0, 1, 0, 0, 1, 0, 0,
+		},
+		prisonAfterNDays([]int{
+			1, 1, 0, 1, 1, 0, 1, 1,
+		}, 6),
+	)
+	assert.Equal(
+		[]int{
+			0, 0, 1, 1, 0, 0, 0, 0,
+		},
+		prisonAfterNDays([]int{
+			0, 1, 0, 1, 1, 0, 0, 1,
+		}, 7),
+	)
+	assert.Equal(
+		[]int{
+			0, 0, 1, 1, 1, 1, 1, 0,
+		},
+		prisonAfterNDays([]int{
+			1, 0, 0, 1, 0, 0, 1, 0,
+		}, 1000000000),
+	)
+}
