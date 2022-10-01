@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,7 +28,7 @@ func numDecodingsRecursive(s string) int {
 	return numDecodingsRecursive(s[1:])
 }
 
-func numDecodings(s string) int {
+func numDecodingsOld(s string) int {
 	if s[0] == '0' {
 		return 0
 	}
@@ -48,6 +49,29 @@ func numDecodings(s string) int {
 		pprev, prev = prev, current
 	}
 	return prev
+}
+
+// more readable
+func numDecodings(s string) int {
+	if s[0] == '0' {
+		return 0
+	}
+	canEncode := make(map[string]bool, 26)
+	for i := 0; i < 26; i++ {
+		canEncode[fmt.Sprintf("%d", i+1)] = true
+	}
+	prev, current := 1, 1
+	for i := 1; i < len(s); i++ {
+		next := 0
+		if canEncode[s[i:i+1]] {
+			next += current
+		}
+		if canEncode[s[i-1:i+1]] {
+			next += prev
+		}
+		prev, current = current, next
+	}
+	return current
 }
 
 func TestDecodings(t *testing.T) {
