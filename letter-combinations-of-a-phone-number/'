@@ -1,0 +1,5 @@
+package main
+
+var numbers =map[rune]string{
+	"1":"",
+}
