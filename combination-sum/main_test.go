@@ -12,12 +12,11 @@ func combinationSum(candidates []int, target int) (ans [][]int) {
 		return [][]int{{}}
 	}
 	for idx, candidate := range candidates {
-		if target < candidate {
+		if candidate > target {
 			continue
 		}
-		for _, val := range combinationSum(candidates[idx:], target-candidate) {
-			ans = append(ans, append(val, candidate))
-			// fmt.Printf("ans: %v\n", ans)
+		for _, subAns := range combinationSum(candidates[idx:], target-candidate) {
+			ans = append(ans, append(subAns, candidate))
 		}
 	}
 	return ans

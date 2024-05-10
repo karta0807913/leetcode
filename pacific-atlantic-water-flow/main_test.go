@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,47 +9,47 @@ import (
 const PACIFIC_BIT = 1
 const ATLANTIC_BIT = 2
 
-func pacificAtlanticRecursive(heights, flowMap [][]int, colIdx, rowIdx int, state int) {
-	currentHeight := heights[colIdx][rowIdx]
-	if flowMap[colIdx][rowIdx]&state != 0 {
+func recursive(heights, statusMap [][]int, x, y int, status int) {
+	if statusMap[y][x]&status != 0 {
 		return
 	}
-	flowMap[colIdx][rowIdx] |= state
+	statusMap[y][x] |= status
 
-	fmt.Printf("flowMap: %v\n", flowMap)
-	if colIdx != 0 && currentHeight <= heights[colIdx-1][rowIdx] {
-		pacificAtlanticRecursive(heights, flowMap, colIdx-1, rowIdx, state)
+	if x > 0 && heights[y][x] <= heights[y][x-1] {
+		recursive(heights, statusMap, x-1, y, status)
 	}
-	if rowIdx != 0 && currentHeight <= heights[colIdx][rowIdx-1] {
-		pacificAtlanticRecursive(heights, flowMap, colIdx, rowIdx-1, state)
+
+	if y > 0 && heights[y][x] <= heights[y-1][x] {
+		recursive(heights, statusMap, x, y-1, status)
 	}
-	if colIdx != len(heights)-1 && currentHeight <= heights[colIdx+1][rowIdx] {
-		pacificAtlanticRecursive(heights, flowMap, colIdx+1, rowIdx, state)
+
+	if x+1 < len(heights[y]) && heights[y][x] <= heights[y][x+1] {
+		recursive(heights, statusMap, x+1, y, status)
 	}
-	if rowIdx != len(heights[0])-1 && currentHeight <= heights[colIdx][rowIdx+1] {
-		pacificAtlanticRecursive(heights, flowMap, colIdx, rowIdx+1, state)
+
+	if y+1 < len(heights) && heights[y][x] <= heights[y+1][x] {
+		recursive(heights, statusMap, x, y+1, status)
 	}
 }
 
 func pacificAtlantic(heights [][]int) [][]int {
-	flowMap := make([][]int, len(heights))
-	for colIdx, _ := range heights {
-		flowMap[colIdx] = make([]int, len(heights[colIdx]))
+	statusMap := make([][]int, 0, len(heights))
+	for _, column := range heights {
+		statusMap = append(statusMap, make([]int, len(column)))
 	}
-	for colIdx := range heights {
-		pacificAtlanticRecursive(heights, flowMap, colIdx, 0, PACIFIC_BIT)
-		pacificAtlanticRecursive(heights, flowMap, colIdx, len(heights[0])-1, ATLANTIC_BIT)
+	for y := range heights {
+		recursive(heights, statusMap, 0, y, PACIFIC_BIT)
+		recursive(heights, statusMap, len(heights[0])-1, y, ATLANTIC_BIT)
 	}
-	for rowIdx := range heights[0] {
-		pacificAtlanticRecursive(heights, flowMap, 0, rowIdx, PACIFIC_BIT)
-		pacificAtlanticRecursive(heights, flowMap, len(heights)-1, rowIdx, ATLANTIC_BIT)
+	for x := range heights[0] {
+		recursive(heights, statusMap, x, 0, PACIFIC_BIT)
+		recursive(heights, statusMap, x, len(heights)-1, ATLANTIC_BIT)
 	}
-	fmt.Printf("flowMap: %v\n", flowMap)
-	answer := make([][]int, 0)
-	for colIdx, column := range heights {
-		for rowIdx := range column {
-			if flowMap[colIdx][rowIdx]&3 == (PACIFIC_BIT | ATLANTIC_BIT) {
-				answer = append(answer, []int{colIdx, rowIdx})
+	answer := [][]int{}
+	for y, column := range heights {
+		for x := range column {
+			if statusMap[y][x] == (PACIFIC_BIT | ATLANTIC_BIT) {
+				answer = append(answer, []int{y, x})
 			}
 		}
 	}

@@ -1,8 +1,5 @@
-#[path = "./jump-game/main.rs"]
-mod jump_game;
-
-#[path = "./keys-and-rooms/main.rs"]
-mod keys_and_rooms;
+#[path="./successful-pairs-of-spells-and-potions/main.rs"]
+mod Solution;
 
 fn main() {
 }

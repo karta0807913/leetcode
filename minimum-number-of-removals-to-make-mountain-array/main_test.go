@@ -1,6 +1,7 @@
 package main
 
 import (
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -56,6 +57,7 @@ func minimumMountainRemovals(nums []int) int {
 		}
 	}
 	return result
+	runtime.GC()
 }
 
 func TestResult(t *testing.T) {
